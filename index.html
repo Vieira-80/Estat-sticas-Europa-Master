@@ -1,358 +1,1232 @@
-<!DOCTYPE html><html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
+
 <meta charset="UTF-8">
-<title>Liga Individual Europa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Estatísticas da Equipa</title>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
-body {
-  font-family: 'Segoe UI', Arial;
-  background:#0f172a;
-  color:white;
-  padding:15px;
+
+*{
+  box-sizing:border-box;
 }
 
-h1 { text-align:center; }
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Segoe UI',Arial,sans-serif;
 
-#adminBtn {
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(255,255,255,.15),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 50% 110%,
+      rgba(0,0,0,.55),
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
+      #08745b,
+      #075846 45%,
+      #064c3d
+    );
+
+  color:#f8fafc;
+  padding:18px;
+}
+
+body::before{
+  content:"";
   position:fixed;
-  top:10px;
-  right:10px;
-  background:transparent;
-  border:none;
-  color:#64748b;
+  inset:0;
+
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.012) 0px,
+      rgba(255,255,255,.012) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+
+  pointer-events:none;
+}
+
+/* =========================
+   CABEÇALHO
+========================= */
+
+.header{
+  max-width:950px;
+  margin:25px auto 30px auto;
+  text-align:center;
+}
+
+.bola8{
+  width:70px;
+  height:70px;
+
+  margin:0 auto 15px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      #475569,
+      #020617 55%,
+      #000
+    );
+
+  border-radius:50%;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.55),
+    0 0 25px rgba(250,204,21,.15);
+}
+
+.numero8{
+  width:30px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#f8fafc;
+  color:#020617;
+
+  border-radius:50%;
+
+  font-size:18px;
+  font-weight:900;
+}
+
+h1{
+  margin:0;
+
+  color:#facc15;
+
+  font-size:32px;
+  letter-spacing:1.5px;
+
+  text-shadow:
+    0 3px 10px rgba(0,0,0,.7),
+    0 0 20px rgba(250,204,21,.15);
+}
+
+.subtitulo{
+  margin-top:8px;
+  color:#cbd5e1;
+  font-size:14px;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+#adminBtn{
+  position:fixed;
+  top:12px;
+  right:12px;
+
+  z-index:999;
+
+  border:1px solid rgba(255,255,255,.15);
+
+  background:rgba(2,6,23,.35);
+  color:#cbd5e1;
+
+  width:40px;
+  height:40px;
+
+  border-radius:50%;
+
+  cursor:pointer;
+
+  backdrop-filter:blur(8px);
+
   font-size:16px;
-  opacity:0.6;
 }
 
-.card {
-  background:#1e293b;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:20px;
+#estadoOperador{
+  display:none;
+
+  max-width:950px;
+  margin:-15px auto 20px;
+
+  padding:10px;
+
+  text-align:center;
+
+  color:#86efac;
+
+  background:rgba(34,197,94,.10);
+
+  border:1px solid rgba(34,197,94,.25);
+
+  border-radius:10px;
+
+  font-size:13px;
 }
 
-.jogo {
+/* =========================
+   CARD
+========================= */
+
+.card{
+  max-width:950px;
+  margin:0 auto 25px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15,23,42,.88),
+      rgba(15,23,42,.72)
+    );
+
+  border-radius:18px;
+
+  border:1px solid rgba(250,204,21,.18);
+
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.04);
+
+  overflow:hidden;
+
+  backdrop-filter:blur(12px);
+}
+
+.card-header{
+  padding:18px 20px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.06);
+
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:#0f172a;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:6px;
 }
 
-.jogador {
-  width:40%;
-  text-align:center;
-  font-weight:bold;
+.card-header h2{
+  margin:0;
+  font-size:20px;
 }
 
-input {
-  width:45px;
-  text-align:center;
-  border-radius:6px;
-  border:none;
-  background:#334155;
-  color:white;
-  font-size:16px;
+.atualizacao{
+  font-size:12px;
+  color:#94a3b8;
 }
 
-.vencedor { color:#22c55e; }
-.derrotado { color:#ef4444; }
+/* =========================
+   TABELA
+========================= */
 
-.tabela {
-  margin-top:10px;
-  background:#0f172a;
-  border-radius:10px;
-  padding:10px;
+.tabela-container{
+  width:100%;
+  overflow-x:auto;
 }
 
-.tabela table {
+table{
   width:100%;
   border-collapse:collapse;
+  min-width:650px;
 }
 
-.tabela th {
-  background:#1e293b;
-  color:#94a3b8;
-  font-weight:600;
-}
+th{
+  padding:14px 10px;
 
-.tabela th, .tabela td {
-  padding:8px;
-  text-align:center;
-}
+  background:#020617;
 
-.apurado { background:#1e3a8a; }
-.melhor6 { background:#92400e; color:#fef3c7; font-weight:bold; }
-.naoapurado { background:#0f172a; }
+  color:#facc15;
 
-.linha { border-bottom:2px solid #facc15; }
-
-.legenda {
-  margin-top:10px;
   font-size:13px;
-  opacity:0.8;
+  font-weight:700;
+
   text-align:center;
+
+  border-bottom:
+    1px solid rgba(250,204,21,.15);
 }
+
+td{
+  padding:14px 10px;
+
+  text-align:center;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.045);
+
+  font-size:14px;
+}
+
+tbody tr{
+  transition:.2s;
+}
+
+tbody tr:hover{
+  background:rgba(255,255,255,.025);
+}
+
+.posicao{
+  color:#94a3b8;
+  font-weight:700;
+}
+
+.nome{
+  font-weight:600;
+  text-align:left;
+}
+
+.total{
+  font-weight:800;
+}
+
+.ganhas{
+  color:#86efac;
+  font-weight:700;
+}
+
+.perdidas{
+  color:#fca5a5;
+  font-weight:700;
+}
+
+.percentagem{
+  font-weight:800;
+  color:#facc15;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+input[type="number"]{
+  width:68px;
+
+  padding:8px 5px;
+
+  text-align:center;
+
+  background:#1e293b;
+
+  color:white;
+
+  border:1px solid #475569;
+
+  border-radius:7px;
+
+  font-size:16px;
+
+  font-weight:700;
+}
+
+input[type="number"]:focus{
+  outline:none;
+
+  border-color:#facc15;
+
+  box-shadow:
+    0 0 0 2px rgba(250,204,21,.15);
+}
+
+/* =========================
+   BARRA
+========================= */
+
+.barra{
+  width:100%;
+  min-width:70px;
+
+  height:5px;
+
+  margin-top:6px;
+
+  background:#1e293b;
+
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.barra-preenchida{
+  height:100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #16a34a,
+      #86efac
+    );
+
+  border-radius:20px;
+
+  transition:width .25s ease;
+}
+
+/* =========================
+   BOTÃO GUARDAR
+========================= */
+
+#guardarBtn{
+  display:none;
+
+  margin:20px auto 12px;
+
+  padding:12px 28px;
+
+  border:none;
+
+  border-radius:9px;
+
+  background:#facc15;
+
+  color:#111827;
+
+  font-weight:800;
+
+  font-size:14px;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 15px rgba(250,204,21,.2);
+}
+
+#guardarBtn:hover{
+  background:#fde047;
+}
+
+/* =========================
+   MENSAGEM
+========================= */
+
+#mensagem{
+  text-align:center;
+
+  font-size:13px;
+
+  min-height:24px;
+
+  margin:8px 10px 15px;
+}
+
+.sucesso{
+  color:#86efac;
+}
+
+.erro{
+  color:#fca5a5;
+}
+
+/* =========================
+   LEGENDA
+========================= */
+
+.legenda{
+  max-width:950px;
+
+  margin:15px auto;
+
+  text-align:center;
+
+  color:#94a3b8;
+
+  font-size:12px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  body{
+    padding:10px;
+  }
+
+  .header{
+    margin-top:25px;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  .bola8{
+    width:58px;
+    height:58px;
+  }
+
+  .numero8{
+    width:26px;
+    height:26px;
+    font-size:15px;
+  }
+
+  .card{
+    border-radius:14px;
+  }
+
+  .card-header{
+    padding:15px;
+  }
+
+  td,th{
+    padding:11px 7px;
+    font-size:12px;
+  }
+
+  input[type="number"]{
+    width:62px;
+    font-size:16px;
+  }
+
+}
+
 </style>
 </head>
 
 <body>
+
 <button id="adminBtn" onclick="login()">⚙️</button>
 
-<h1>LIGA INDIVIDUAL EUROPA</h1>
-<div id="app"></div>
+<div class="header">
+
+  <div class="bola8">
+    <div class="numero8">8</div>
+  </div>
+
+  <h1>ESTATÍSTICAS DA EQUIPA</h1>
+
+  <div class="subtitulo">
+    Bilhar • Estatísticas individuais
+  </div>
+
+</div>
+
+<div id="estadoOperador">
+  ⚙️ Modo operador ativo — podes alterar as estatísticas
+</div>
+
+<div class="card">
+
+  <div class="card-header">
+
+    <h2>🎱 Jogadores</h2>
+
+    <span class="atualizacao">
+      Estatísticas
+    </span>
+
+  </div>
+
+  <div class="tabela-container">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>#</th>
+
+          <th style="text-align:left">
+            Jogador
+          </th>
+
+          <th>PT</th>
+
+          <th>PG</th>
+
+          <th>PP</th>
+
+          <th>% Vitórias</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="tabelaJogadores"></tbody>
+
+    </table>
+
+  </div>
+
+  <button
+    id="guardarBtn"
+    onclick="guardar()">
+    GUARDAR ALTERAÇÕES
+  </button>
+
+  <div id="mensagem"></div>
+
+</div>
+
+<div class="legenda">
+  PT = Partidas Totais &nbsp; • &nbsp;
+  PG = Partidas Ganhas &nbsp; • &nbsp;
+  PP = Partidas Perdidas
+</div>
 
 <script>
+
+/* =====================================
+   CONFIGURAÇÃO
+===================================== */
+
 const PASSWORD = "1234";
+
 let editavel = false;
+let dados = {};
+let db = null;
 
-function login(){
-  let tentativa = prompt("Código operador:");
-  if(tentativa === PASSWORD){
-    editavel = true;
-    alert("Modo operador ativo");
-    aplicarPermissoes();
-  } else {
-    alert("Código errado");
-  }
-}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAjGPkHEc1-srjVvI8rhfhsTP-prs0jNUE",
-  authDomain: "liga-individual-europa.firebaseapp.com",
-  databaseURL: "https://liga-individual-europa-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "liga-individual-europa"
-};
+/* =====================================
+   JOGADORES
+===================================== */
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-const grupos = {
-  grupoA:["Maga","Gil","Monteiro","F. Carvalho","Rui","M. Alves","Diogo"],
-  grupoB:["Carriço","Europa","Osório","Fábio","Bezelga","Igor","Sousa"],
-  grupoC:["N. Vieira","Jorge António","Quim Zé","Cenário","Queirós","P. Jorge","Cristian"]
-};
-
-const jornadas = [
- [[2,1],[3,7],[4,6]],
- [[1,3],[7,4],[6,5]],
- [[4,1],[3,2],[5,7]],
- [[1,5],[2,4],[7,6]],
- [[6,1],[5,2],[4,3]],
- [[1,7],[2,6],[3,5]],
- [[7,2],[6,3],[5,4]]
+const jogadores = [
+  "Rosas",
+  "Nelson",
+  "P Magalhães",
+  "N Oliveira",
+  "F Pinto",
+  "F Duarte",
 ];
 
-let dadosGlobais = {};
-let rankingsGlobais = {};
-let melhorSextoGlobal = null;
 
-function valorValido(v){
-  return v !== undefined && v !== null && v !== "" && !Number.isNaN(Number(v));
-}
+/* =====================================
+   FIREBASE
+===================================== */
 
-function criar(){
-  let html="";
+const firebaseConfig = {
 
-  Object.keys(grupos).forEach(id=>{
+  apiKey:
+    "AIzaSyCH2x07uqd8f9Move6duv4NYCEx3SKacjQ",
 
-    html+=`<div class="card"><h2>${id.toUpperCase()}</h2>`;
+  authDomain:
+    "liga-verao-salaoeuropa.firebaseapp.com",
 
-    jornadas.forEach((jornada,j)=>{
-      html+=`<h3>Jornada ${j+1}</h3>`;
+  databaseURL:
+    "https://liga-verao-salaoeuropa-default-rtdb.europe-west1.firebasedatabase.app",
 
-      jornada.forEach((jogo,i)=>{
+  projectId:
+    "liga-verao-salaoeuropa"
 
-        let p1=grupos[id][jogo[0]-1];
-        let p2=grupos[id][jogo[1]-1];
+};
 
-        let a = dadosGlobais[`${id}-${j}-${i}-1`] || "";
-        let b = dadosGlobais[`${id}-${j}-${i}-2`] || "";
 
-        let c1="", c2="";
-        if(valorValido(a) && valorValido(b)){
-          if(Number(a)>Number(b)){ c1="vencedor"; c2="derrotado"; }
-          else if(Number(b)>Number(a)){ c2="vencedor"; c1="derrotado"; }
-        }
+try{
 
-        html+=`
-        <div class="jogo">
-          <div class="jogador ${c1}">${p1}</div>
-          <div>
-            <input data-id="${id}-${j}-${i}-1" value="${a}">
-            -
-            <input data-id="${id}-${j}-${i}-2" value="${b}">
-          </div>
-          <div class="jogador ${c2}">${p2}</div>
-        </div>`;
-      });
-    });
+  firebase.initializeApp(firebaseConfig);
 
-    html+=`<div class="tabela">
-    <table id="class-${id}">
-    <tr><th>#</th><th>Jogador</th><th>JG</th><th>PG</th><th>PP</th><th>DP</th><th>Pts</th></tr>
-    </table>
-    <div class="legenda">
-      <p>* Azul = 5 primeiros apurados</p>
-      <p>* Dourado = melhor 6.º lugar apurado</p>
-    </div>
-    </div></div>`;
-  });
+  db = firebase.database();
 
-  document.getElementById("app").innerHTML=html;
+  db.ref("estatisticas_equipa").on(
 
-  aplicarPermissoes();
+    "value",
 
-  document.querySelectorAll("input").forEach(i=>{
-    i.oninput = guardar;
-  });
+    snapshot => {
 
-  calcular();
-}
+      dados = snapshot.val() || {};
 
-function guardar(){
-  if(!editavel) return;
+      /*
+       Só redesenha automaticamente se
+       NÃO estivermos a editar.
 
-  document.querySelectorAll("input").forEach(i=>{
-    dadosGlobais[i.dataset.id]=i.value;
-  });
+       Isto impede o Firebase de reconstruir
+       os inputs enquanto estás a escrever.
+      */
 
-  db.ref("resultados").set(dadosGlobais);
-}
-
-db.ref("resultados").on("value", snap=>{
-  dadosGlobais = snap.val() || {};
-  criar();
-});
-
-function aplicarPermissoes(){
-  document.querySelectorAll("input").forEach(i=>{
-    i.disabled = !editavel;
-  });
-}
-
-function calcularRankingGrupo(id){
-  let stats={}, confrontos={};
-
-  grupos[id].forEach(j=>{
-    stats[j]={pg:0,pp:0,jg:0,diff:0};
-    confrontos[j]={};
-  });
-
-  jornadas.forEach((jornada,j)=>{
-    jornada.forEach((jogo,i)=>{
-
-      let p1=grupos[id][jogo[0]-1];
-      let p2=grupos[id][jogo[1]-1];
-
-      let a = dadosGlobais[`${id}-${j}-${i}-1`];
-      let b = dadosGlobais[`${id}-${j}-${i}-2`];
-
-      if(valorValido(a) && valorValido(b)){
-
-        let va = Number(a);
-        let vb = Number(b);
-
-        stats[p1].pg += va;
-        stats[p1].pp += vb;
-        stats[p2].pg += vb;
-        stats[p2].pp += va;
-
-        stats[p1].jg += 1;
-        stats[p2].jg += 1;
-
-        stats[p1].diff = stats[p1].pg - stats[p1].pp;
-        stats[p2].diff = stats[p2].pg - stats[p2].pp;
-
-        confrontos[p1][p2] = va - vb;
-        confrontos[p2][p1] = vb - va;
+      if(!editavel){
+        render();
       }
 
-    });
-  });
+    },
 
-  let lista = grupos[id].map(j=>({
-    grupo:id,
-    nome:j,
-    pg:stats[j].pg,
-    pp:stats[j].pp,
-    jg:stats[j].jg,
-    pts:stats[j].pg,
-    diff:stats[j].diff
-  }));
+    erro => {
 
-  lista.sort((a,b)=>{
-    if(b.pts !== a.pts) return b.pts - a.pts;
+      console.error(
+        "Erro ao carregar Firebase:",
+        erro
+      );
 
-    let cd = confrontos[a.nome]?.[b.nome];
-    if(cd !== undefined && cd !== 0){
-      return -cd;
+      render();
+
     }
 
-    if(b.diff !== a.diff) return b.diff - a.diff;
-    return b.pg - a.pg;
-  });
+  );
 
-  return lista;
+}
+catch(erro){
+
+  console.error(
+    "Erro Firebase:",
+    erro
+  );
+
+  render();
+
 }
 
-function calcular(){
 
-  rankingsGlobais = {};
-  let sextos = [];
+/* =====================================
+   LOGIN
+===================================== */
 
-  Object.keys(grupos).forEach(id=>{
-    let lista = calcularRankingGrupo(id);
-    rankingsGlobais[id] = lista;
+function login(){
 
-    if(lista[5]){
-      sextos.push(lista[5]);
+  if(editavel){
+
+    editavel = false;
+
+    document
+      .getElementById("estadoOperador")
+      .style.display = "none";
+
+    document
+      .getElementById("guardarBtn")
+      .style.display = "none";
+
+    render();
+
+    return;
+
+  }
+
+
+  const tentativa =
+    prompt("Código operador:");
+
+
+  if(tentativa === PASSWORD){
+
+    editavel = true;
+
+    document
+      .getElementById("estadoOperador")
+      .style.display = "block";
+
+    document
+      .getElementById("guardarBtn")
+      .style.display = "block";
+
+    render();
+
+  }
+
+  else if(tentativa !== null){
+
+    alert("Código errado");
+
+  }
+
+}
+
+
+/* =====================================
+   SEGURANÇA TEXTO
+===================================== */
+
+function escaparHTML(texto){
+
+  return String(texto)
+
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =====================================
+   NÚMEROS
+===================================== */
+
+function numeroSeguro(valor){
+
+  if(
+    valor === "" ||
+    valor === null ||
+    valor === undefined
+  ){
+    return 0;
+  }
+
+  const numero = Number(valor);
+
+  if(
+    Number.isNaN(numero) ||
+    numero < 0
+  ){
+    return 0;
+  }
+
+  return Math.floor(numero);
+
+}
+
+
+/* =====================================
+   RENDER PRINCIPAL
+===================================== */
+
+function render(){
+
+  const tbody =
+    document.getElementById(
+      "tabelaJogadores"
+    );
+
+  if(!tbody) return;
+
+  let html = "";
+
+
+  jogadores.forEach(
+    (jogador,index)=>{
+
+      const registo =
+        dados[jogador] || {};
+
+
+      const ganhas =
+        numeroSeguro(
+          registo.ganhas
+        );
+
+
+      const perdidas =
+        numeroSeguro(
+          registo.perdidas
+        );
+
+
+      const total =
+        ganhas + perdidas;
+
+
+      const percentagem =
+        total > 0
+        ? (ganhas / total) * 100
+        : 0;
+
+
+      html += `
+
+      <tr data-linha-jogador="${escaparHTML(jogador)}">
+
+        <td class="posicao">
+          ${index + 1}
+        </td>
+
+
+        <td class="nome">
+          ${escaparHTML(jogador)}
+        </td>
+
+
+        <td
+          class="total"
+          data-total="${escaparHTML(jogador)}">
+
+          ${total}
+
+        </td>
+
+
+        <td class="ganhas">
+
+          ${
+            editavel
+
+            ? `
+              <input
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="1"
+                data-jogador="${escaparHTML(jogador)}"
+                data-tipo="ganhas"
+                value="${ganhas}"
+                oninput="atualizarLinha(this)"
+              >
+            `
+
+            : ganhas
+          }
+
+        </td>
+
+
+        <td class="perdidas">
+
+          ${
+            editavel
+
+            ? `
+              <input
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="1"
+                data-jogador="${escaparHTML(jogador)}"
+                data-tipo="perdidas"
+                value="${perdidas}"
+                oninput="atualizarLinha(this)"
+              >
+            `
+
+            : perdidas
+          }
+
+        </td>
+
+
+        <td
+          class="percentagem"
+          data-percentagem="${escaparHTML(jogador)}">
+
+          <span class="valor-percentagem">
+
+            ${percentagem
+              .toFixed(1)
+              .replace(".",",")}%
+
+          </span>
+
+
+          <div class="barra">
+
+            <div
+              class="barra-preenchida"
+              style="width:${percentagem}%">
+            </div>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+      `;
+
     }
-  });
+  );
 
-  sextos.sort((a,b)=>{
-    if(b.pts !== a.pts) return b.pts - a.pts;
-    if(b.diff !== a.diff) return b.diff - a.diff;
-    if(b.pg !== a.pg) return b.pg - a.pg;
-    if(a.pp !== b.pp) return a.pp - b.pp;
-    return a.nome.localeCompare(b.nome);
-  });
 
-  melhorSextoGlobal = sextos[0] || null;
+  tbody.innerHTML = html;
 
-  Object.keys(grupos).forEach(id=>{
-    let lista = rankingsGlobais[id];
-    let t=document.getElementById("class-"+id);
-
-    t.innerHTML="<tr><th>#</th><th>Jogador</th><th>JG</th><th>PG</th><th>PP</th><th>DP</th><th>Pts</th></tr>";
-
-    lista.forEach((j,idx)=>{
-
-      let melhor6 = melhorSextoGlobal &&
-                    j.nome === melhorSextoGlobal.nome &&
-                    j.grupo === melhorSextoGlobal.grupo &&
-                    idx === 5;
-
-      let c = idx<5 ? "apurado" : melhor6 ? "melhor6" : "naoapurado";
-      let l = idx===4 ? "linha" : "";
-
-      t.innerHTML+=`
-      <tr class="${c} ${l}">
-        <td>${idx+1}</td>
-        <td>${j.nome}${melhor6 ? " ⭐" : ""}</td>
-        <td>${j.jg}</td>
-        <td>${j.pg}</td>
-        <td>${j.pp}</td>
-        <td>${j.diff}</td>
-        <td>${j.pts}</td>
-      </tr>`;
-    });
-  });
 }
+
+
+/* =====================================
+   ATUALIZAÇÃO SEM PERDER FOCO
+===================================== */
+
+function atualizarLinha(input){
+
+  const linha =
+    input.closest("tr");
+
+
+  if(!linha){
+    return;
+  }
+
+
+  const jogador =
+    input.dataset.jogador;
+
+
+  const inputGanhas =
+    linha.querySelector(
+      '[data-tipo="ganhas"]'
+    );
+
+
+  const inputPerdidas =
+    linha.querySelector(
+      '[data-tipo="perdidas"]'
+    );
+
+
+  /*
+    Aqui NÃO fazemos render().
+    Apenas lemos os dois campos da linha.
+  */
+
+  const ganhas =
+    numeroSeguro(
+      inputGanhas.value
+    );
+
+
+  const perdidas =
+    numeroSeguro(
+      inputPerdidas.value
+    );
+
+
+  const total =
+    ganhas + perdidas;
+
+
+  const percentagem =
+    total > 0
+    ? (ganhas / total) * 100
+    : 0;
+
+
+  /*
+    Atualiza os dados locais.
+  */
+
+  if(!dados[jogador]){
+
+    dados[jogador] = {
+      ganhas:0,
+      perdidas:0
+    };
+
+  }
+
+
+  dados[jogador].ganhas =
+    ganhas;
+
+
+  dados[jogador].perdidas =
+    perdidas;
+
+
+  /*
+    Atualiza apenas PT.
+  */
+
+  const totalElemento =
+    linha.querySelector(
+      ".total"
+    );
+
+
+  if(totalElemento){
+
+    totalElemento.textContent =
+      total;
+
+  }
+
+
+  /*
+    Atualiza apenas a percentagem.
+  */
+
+  const percentagemElemento =
+    linha.querySelector(
+      ".valor-percentagem"
+    );
+
+
+  if(percentagemElemento){
+
+    percentagemElemento.textContent =
+      percentagem
+        .toFixed(1)
+        .replace(".",",")
+      + "%";
+
+  }
+
+
+  /*
+    Atualiza apenas a barra.
+  */
+
+  const barra =
+    linha.querySelector(
+      ".barra-preenchida"
+    );
+
+
+  if(barra){
+
+    barra.style.width =
+      percentagem + "%";
+
+  }
+
+}
+
+
+/* =====================================
+   GUARDAR
+===================================== */
+
+function guardar(){
+
+  if(!editavel){
+    return;
+  }
+
+
+  /*
+    Lê TODOS os inputs uma última vez
+    antes de enviar para o Firebase.
+  */
+
+  document
+    .querySelectorAll(
+      'input[type="number"][data-jogador]'
+    )
+    .forEach(input=>{
+
+      const jogador =
+        input.dataset.jogador;
+
+
+      const tipo =
+        input.dataset.tipo;
+
+
+      if(!dados[jogador]){
+
+        dados[jogador] = {
+          ganhas:0,
+          perdidas:0
+        };
+
+      }
+
+
+      dados[jogador][tipo] =
+        numeroSeguro(
+          input.value
+        );
+
+    });
+
+
+  if(!db){
+
+    mostrarMensagem(
+      "Não foi possível ligar à base de dados.",
+      false
+    );
+
+    return;
+
+  }
+
+
+  mostrarMensagem(
+    "A guardar...",
+    true
+  );
+
+
+  db.ref("estatisticas_equipa")
+
+    .set(dados)
+
+    .then(()=>{
+
+      mostrarMensagem(
+        "✓ Estatísticas guardadas com sucesso.",
+        true
+      );
+
+      /*
+        Não fazemos render aqui.
+        Assim os inputs continuam estáveis.
+      */
+
+    })
+
+    .catch(erro=>{
+
+      console.error(
+        "Erro ao guardar:",
+        erro
+      );
+
+
+      mostrarMensagem(
+        "Erro ao guardar as estatísticas.",
+        false
+      );
+
+    });
+
+}
+
+
+/* =====================================
+   MENSAGENS
+===================================== */
+
+function mostrarMensagem(
+  texto,
+  sucesso
+){
+
+  const elemento =
+    document.getElementById(
+      "mensagem"
+    );
+
+
+  elemento.textContent =
+    texto;
+
+
+  elemento.className =
+    sucesso
+    ? "sucesso"
+    : "erro";
+
+
+  if(texto !== "A guardar..."){
+
+    setTimeout(()=>{
+
+      elemento.textContent = "";
+
+      elemento.className = "";
+
+    },3000);
+
+  }
+
+}
+
+
+/* =====================================
+   PRIMEIRO RENDER
+===================================== */
+
+/*
+  Faz com que a tabela apareça mesmo
+  enquanto o Firebase está a carregar.
+*/
+
+render();
+
 </script>
+
 </body>
 </html>
